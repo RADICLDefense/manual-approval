@@ -21,6 +21,16 @@ build:
 	@echo "Pushing multi-arch manifest..."
 	docker manifest push $(IMAGE_REPO):$(VERSION)
 
+.PHONY: build-only
+build-only:
+	@echo "Building AMD64 image (no push) - verifying build works..."
+	docker buildx build --platform linux/amd64 -t $(IMAGE_REPO):test-amd64 --load .
+	@echo "Building ARM64 image (no push) - verifying cross-platform build works..."
+	@TMPFILE=$$(mktemp) && \
+	docker buildx build --platform linux/arm64 -t $(IMAGE_REPO):test-arm64 --output type=oci,dest=$$TMPFILE . && \
+	rm -f $$TMPFILE && \
+	echo "ARM64 build verified successfully"
+
 .PHONY: build-local
 build-local:
 	@if [ -z "$(VERSION)" ]; then \

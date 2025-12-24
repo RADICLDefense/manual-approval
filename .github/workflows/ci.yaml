@@ -17,16 +17,19 @@ jobs:
   ci:
     name: CI
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Refresh module hashsums
         run: make tidy
-      - name: Build
-        run: make build
-        env:
-          VERSION: latest
+      - name: Build (no push)
+        run: make build-only
 
       - name: Test
         run: make test
