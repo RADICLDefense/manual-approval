@@ -11,15 +11,14 @@ build:
 		exit 1; \
 	fi
 	@echo "Building and pushing AMD64 image..."
-	docker buildx build --platform linux/amd64 -t $(IMAGE_REPO):$(VERSION)-amd64 --push .
+	@docker buildx build --platform linux/amd64 --provenance=false --sbom=false -t $(IMAGE_REPO):$(VERSION)-amd64 --push . || (echo "Failed to build/push AMD64 image" && exit 1)
 	@echo "Building and pushing ARM64 image..."
-	docker buildx build --platform linux/arm64 -t $(IMAGE_REPO):$(VERSION)-arm64 --push .
+	@docker buildx build --platform linux/arm64 --provenance=false --sbom=false -t $(IMAGE_REPO):$(VERSION)-arm64 --push . || (echo "Failed to build/push ARM64 image" && exit 1)
 	@echo "Creating multi-arch manifest..."
-	docker manifest create $(IMAGE_REPO):$(VERSION) \
-		--amend $(IMAGE_REPO):$(VERSION)-amd64 \
-		--amend $(IMAGE_REPO):$(VERSION)-arm64
-	@echo "Pushing multi-arch manifest..."
-	docker manifest push $(IMAGE_REPO):$(VERSION)
+	@docker buildx imagetools create -t $(IMAGE_REPO):$(VERSION) \
+		$(IMAGE_REPO):$(VERSION)-amd64 \
+		$(IMAGE_REPO):$(VERSION)-arm64 || (echo "Failed to create multi-arch manifest" && exit 1)
+	@echo "Successfully built and pushed multi-arch image: $(IMAGE_REPO):$(VERSION)"
 
 .PHONY: build-only
 build-only:
