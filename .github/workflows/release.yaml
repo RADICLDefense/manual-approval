@@ -32,7 +32,28 @@ jobs:
       - name: Refresh module hashsums
         run: make tidy
 
-      - name: Build and push multi-arch image
-        run: make build
-        env:
-          VERSION: ${{ inputs.version }}
+      - name: Build and push AMD64 image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ghcr.io/radicldefense/rad-manual-approval:${{ inputs.version }}-amd64
+          provenance: false
+          sbom: false
+
+      - name: Build and push ARM64 image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/arm64
+          push: true
+          tags: ghcr.io/radicldefense/rad-manual-approval:${{ inputs.version }}-arm64
+          provenance: false
+          sbom: false
+
+      - name: Create multi-arch manifest
+        run: |
+          docker buildx imagetools create -t ghcr.io/radicldefense/rad-manual-approval:${{ inputs.version }} \
+            ghcr.io/radicldefense/rad-manual-approval:${{ inputs.version }}-amd64 \
+            ghcr.io/radicldefense/rad-manual-approval:${{ inputs.version }}-arm64
