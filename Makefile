@@ -10,14 +10,10 @@ build:
 		echo "VERSION is required"; \
 		exit 1; \
 	fi
-	@echo "Building AMD64 image..."
-	docker build --platform linux/amd64 -t $(IMAGE_REPO):$(VERSION)-amd64 .
-	@echo "Building ARM64 image..."
-	docker build --platform linux/arm64 -t $(IMAGE_REPO):$(VERSION)-arm64 .
-	@echo "Pushing AMD64 image..."
-	docker push $(IMAGE_REPO):$(VERSION)-amd64
-	@echo "Pushing ARM64 image..."
-	docker push $(IMAGE_REPO):$(VERSION)-arm64
+	@echo "Building and pushing AMD64 image..."
+	docker buildx build --platform linux/amd64 -t $(IMAGE_REPO):$(VERSION)-amd64 --push .
+	@echo "Building and pushing ARM64 image..."
+	docker buildx build --platform linux/arm64 -t $(IMAGE_REPO):$(VERSION)-arm64 --push .
 	@echo "Creating multi-arch manifest..."
 	docker manifest create $(IMAGE_REPO):$(VERSION) \
 		--amend $(IMAGE_REPO):$(VERSION)-amd64 \
