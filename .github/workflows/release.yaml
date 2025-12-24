@@ -13,7 +13,7 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write  # Required for creating Git tags
       packages: write  # Required for pushing to GHCR
     steps:
       - name: Checkout
@@ -57,3 +57,11 @@ jobs:
           docker buildx imagetools create -t ghcr.io/radicldefense/rad-manual-approval:${{ inputs.version }} \
             ghcr.io/radicldefense/rad-manual-approval:${{ inputs.version }}-amd64 \
             ghcr.io/radicldefense/rad-manual-approval:${{ inputs.version }}-arm64
+
+      - name: Create and push Git tag
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ inputs.version }}" -m "Release ${{ inputs.version }}"
+          git push origin "${{ inputs.version }}"
