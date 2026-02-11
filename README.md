@@ -34,6 +34,7 @@ steps:
       minimum-approvals: 1
       issue-title: "Deploying v1.3.5 to prod from staging"
       issue-body: "Please approve or deny the deployment of version v1.3.5."
+      issue-labels: "deployment"
       exclude-workflow-initiator-as-approver: false
       fail-on-denial: true
       additional-approved-words: ''
@@ -44,6 +45,7 @@ steps:
 * `minimum-approvals` is an integer that sets the minimum number of approvals required to progress the workflow. Defaults to ALL approvers.
 * `issue-title` is a string that will be appended to the title of the issue.
 * `issue-body` is a string that will be prepended to the body of the issue.
+* `issue-labels` is a comma separated list of labels to add to the approval issue.
 * `exclude-workflow-initiator-as-approver` is a boolean that indicates if the workflow initiator (determined by the `GITHUB_ACTOR` environment variable) should be filtered from the final list of approvers. This is optional and defaults to `false`. Set this to `true` to prevent users in the `approvers` list from being able to self-approve workflows.
 * `fail-on-denial` is a boolean that indicates if the workflow should fail if any approver denies the approval. This is optional and defaults to `true`. Set this to `false` to allow the workflow to continue if any approver denies the approval.
 * `additional-approved-words` is a comma separated list of strings to expand the dictionary of words that indicate approval. This is optional and defaults to an empty string.
